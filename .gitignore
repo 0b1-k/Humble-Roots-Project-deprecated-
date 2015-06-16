@@ -55,3 +55,9 @@ docs/_build/
 
 # PyBuilder
 target/
+/*.py~
+/influxDB/influxdb.sh~
+/docs/.~lock.BitFarm.odt#
+/config/config.json~
+/README.md~
+/.gitignore~

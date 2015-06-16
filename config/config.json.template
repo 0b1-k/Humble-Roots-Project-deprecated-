@@ -1,0 +1,155 @@
+{
+"mqtt": {
+	"host": "localhost",
+	"port": 1883,
+	"keepalive": 60,
+	"rootPrefix": "bf"
+	},
+"serial": {
+	"port": "/dev/ttyUSB0",
+	"baudrate": 115200,
+	"pubPrefix": "ser",
+	"subPrefix": "cmd"
+	},
+"influxDB": {
+	"enabled": 0,
+	"host": "localhost",
+	"port": 8086,
+	"user": "<DB USER>",
+	"pswd": "<DB PSWD>",
+	"db": "sensors"
+	},
+"PushBullet": {
+	"enabled": 0,
+	"token": "<YOUR APPLICATION TOKEN>",
+	"appDevice": "HumbleRoots",
+	"alertDevice": "<MOBILE DEVICE PB ID>",
+	"alertNumber": "+1 425 555 1212",
+	"subPrefix": "notify",
+	"accept": {"note": 0, "alert": 0}
+	},
+"sensorDataParser": {
+	"accept": {"srh": 0, "lvl": 0, "clm": 0, "rly": 0, "vlv": 0}
+	},
+"node": {
+	"2": "plant",
+	"4": "sump",
+	"20": "relay",
+	"30": "tank",
+	"40": "climate",
+	"50": "valve"
+	},
+"r":	{
+	"0": "dh",
+	"1": "drain",
+	"2": "vent",
+	"3": "water",
+	"4": "light",
+	"5": "air"
+	},
+"v":	{
+	"0": "filter",
+	"1": "v1",
+	"2": "v2",
+	"3": "v3",
+	"4": "v4",
+	"5": "v5",
+	"6": "v6",
+	"7": "v7"
+	},
+"s":	{
+	"0": "off",
+	"1": "on"
+	},
+"control": {
+	"config": {
+		"subPrefix": "config"
+		},
+	"tick": {
+		"freqSec": 30,
+		"subPrefix": "time"
+		},
+	"nodeTimeout": {
+		"freqSec": 180,
+		"title": "Signal lost"
+		},
+	"command": {
+		"enabled": 1,
+		"subPrefix": "shell",
+		"report": {"enabled": 1}
+		},
+	"signal": [{
+		"enabled": 1,
+		"value": "rssi",
+		"alert": {"op": "<", "setpoint": -80.0, "title": "Low signal strength alert"}
+		}],
+	"srh": [{
+		"enabled": 1,
+		"node": "plant",
+		"value": "p",
+		"time": {"from": "19:00", "to": "20:00"},
+		"on":  {"op": "<", "setpoint": 85.0, "cmd": "node=relay&cmd=act&r=water&s=on"},
+		"off": {"cmd": "node=relay&cmd=act&r=water&s=off"}
+		}],
+	"lvl": [{
+		"enabled": 1,
+		"node": "sump",
+		"value": "cm",
+		"on":  {"op": "<=", "setpoint": 22.1, "cmd": "node=relay&cmd=act&r=drain&s=on"},
+		"off": {"op": ">=", "setpoint": 26.5, "cmd": "node=relay&cmd=act&r=drain&s=off"},
+		"alert": {"op": "<=", "setpoint": 21.0, "title": "High water level alert"}
+		}],
+	"clm": [{
+		"enabled": 1,
+		"node": "climate",
+		"value": "tmp",
+		"on":  {"op": ">",  "setpoint": 25.6, "cmd": "node=relay&cmd=act&r=vent&s=on"},
+		"off": {"cmd": "node=relay&cmd=act&r=vent&s=off"},
+		"alert": {"op": ">=", "setpoint": 30.0, "title": "High temperature alert"}
+		},
+		{
+		"enabled": 1,
+		"node": "climate",
+		"value": "rh",
+		"on":  {"op": ">",  "setpoint": 54.0, "cmd": "node=relay&cmd=act&r=dh&s=on"},
+		"off": {"cmd": "node=relay&cmd=act&r=dh&s=off"},
+		"alert": {"op": ">=", "setpoint": 56.0, "title": "High humidity alert"}
+		}],
+	"timers": [{
+		"enabled": 1,
+		"task": "light",
+		"value": "ts",
+		"time": {"from": "18:00", "to": "06:00"},
+		"on":  {"cmd": "node=relay&cmd=act&r=light&s=on"},
+		"off": {"cmd": "node=relay&cmd=act&r=light&s=off"}
+		}]
+	},
+"report": {
+	"enabled": 1,
+	"title": "Current State",
+	"divider": "~",
+	"node": {
+		"plant": [
+			{"value": "p", "label": "Soil RH", "unit": "%"},
+			{"value": "rssi", "label": "Signal", "unit": "dB"}
+			],
+		"climate": [
+			{"value": "tmp", "label": "Temp", "unit": "C"},
+			{"value": "rh", "label": "RH", "unit": "%"},
+			{"value": "rssi", "label": "Signal", "unit": "dB"}
+			],
+		"sump": [
+			{"value": "cm", "label": "Depth", "unit": "cm"},
+			{"value": "rssi", "label": "Signal", "unit": "dB"}
+			],
+		"relay": [
+			{"value": "r", "state": "s"},
+			{"value": "rssi", "label": "Signal", "unit": "dB"}
+			],
+		"valve": [
+			{"value": "v", "state": "s"},
+			{"value": "rssi", "label": "Signal", "unit": "dB"}
+			]
+		}
+	}
+}
