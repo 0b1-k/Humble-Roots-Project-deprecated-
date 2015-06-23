@@ -61,3 +61,5 @@ target/
 /config/config.json~
 /README.md~
 /.gitignore~
+/config/bootstrap.json.template~
+/config/config.json.template~

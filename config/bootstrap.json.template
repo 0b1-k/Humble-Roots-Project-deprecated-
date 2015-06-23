@@ -3,6 +3,6 @@
 	"host": "localhost",
 	"port": 1883,
 	"keepalive": 60,
-	"rootPrefix": "bf"
+	"rootPrefix": "hrs"
 	}
 }
