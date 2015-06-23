@@ -63,3 +63,9 @@ target/
 /.gitignore~
 /config/bootstrap.json.template~
 /config/config.json.template~
+/arduino/climate/climate.ino~
+/arduino/gateway/gateway.ino~
+/arduino/relays/relays.ino~
+/arduino/soilrh/soilrh.ino~
+/arduino/valves/valves.ino~
+/arduino/waterlevel/waterlevel.ino~
