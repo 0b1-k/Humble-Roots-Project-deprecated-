@@ -1,6 +1,24 @@
 # The Humble Roots Project
+**Home Automation Applied To Medical Cannabis Cultivation**
 
-## Required Python Code Dependencies
+The Humble Roots Project is a grow room automation system designed to meet indoor horticulture
+challenges using open software, open hardware and readily available consumer appliances. The project
+blends these elements together into an inexpensive, reliable, efficient, automated system, with a focus
+on sustainability.
+
+The application of the concepts and technology used as part of the Humble Roots Project is not limited
+to indoor growing or horticulture; it has far-reaching applications to many other automation scenarios
+where sensors, actuators, rules and data visualization are combined to solve a problem. 
+
+For more details, refer to the [project documentation](./docs/HumbleRootsProject.pdf).
+
+![Humble Roots Lab](./docs/lab.png "Humble Roots Lab")
+
+## Required Arduino Dependencies
+
+
+
+## Required Python Dependencies
 
 ### [Install the Mosquitto MQTT broker](http://mosquitto.org/)
 
@@ -34,7 +52,7 @@ cd hashids-python
 sudo python setup.py install
 ```
 
-## Optional Python Code Dependencies
+## Optional Python Dependencies
 
 The following packages only need to be installed if used in the project.
 
@@ -81,5 +99,5 @@ For installing InfluxDB on the Raspberry Pi, or another ARM system, see [here](h
 
 ### [Install Grafana](http://grafana.org/)
 
-Grafana produces beautiful charts and is compatible with InfluxDB.
+Grafana produces beautiful charts and works with InfluxDB.
 
