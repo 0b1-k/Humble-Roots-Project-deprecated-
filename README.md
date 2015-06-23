@@ -12,7 +12,7 @@ where sensors, actuators, rules and data visualization are combined to solve a p
 
 For more details, refer to the [project documentation](./docs/HumbleRootsProject.pdf).
 
-![Humble Roots Lab](./docs/lab.png "Humble Roots Lab")
+![Humble Roots Lab](./docs/humbleroots.png "Humble Roots Lab")
 
 ## Required Arduino Dependencies
 
