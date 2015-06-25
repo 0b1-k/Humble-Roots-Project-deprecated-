@@ -22,11 +22,16 @@ alt="Enigma Girls 2 Growth Timelapse" width="240" height="180" border="10" /></a
 
 ## Getting Started
 
-1. Assemble the custom [hardware](./hardware) and the [wireless](./arduino) nodes
-2. Upload the [sketches](./arduino) to the wireless nodes
-3. Install the Python libraries needed by the project (see below)
-4. Configure the ['bootstrap'](./config/bootstrap.json.template) and ['config'](./config/config.json.template) files
-5. Start the project processes
+1. Install the *Humble Roots Project* files
+
+	```
+	git clone https://github.com/fabienroyer/Humble-Roots-Project.git
+	```
+2. Assemble the [actuator hardware](./hardware/README.md) and the [wireless sensor nodes](./arduino/README.md).
+3. Upload the [sketches](./arduino/README.md) to the wireless nodes.
+4. Install the Python libraries needed by the project (see below).
+5. [Configure](./config/README.md) the ['bootstrap'](./config/bootstrap.json.template) and ['config'](./config/config.json.template) files.
+6. Start the project processes.
 
 ## Required Python Dependencies
 
