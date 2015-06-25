@@ -88,8 +88,8 @@ This section is used by the *DB* module which writes sensor data to the InfluxDB
 	"enabled": 0,
 	"host": "localhost",
 	"port": 8086,
-	"user": "&lt;DB USER&gt;",
-	"pswd": "&lt;DB PSWD&gt;",
+	"user": "<DB USER>",
+	"pswd": "<DB PSWD>",
 	"db": "sensors"
 	}
 ```
