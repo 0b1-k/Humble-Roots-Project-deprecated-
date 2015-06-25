@@ -140,7 +140,7 @@ class Controller():
         if self.cfgData["control"]["command"]["enabled"] == 1:
             print("-----------------------\r\nForwarded command: {0}".format(msg.payload))
             d = UrlDecode(lower(msg.payload))
-            if "node" in d and "cmd" in d and "r" in d and "s" in d:
+            if "node" in d and "cmd" in d:
                 self.cmd.Shell(msg.payload)
             elif "get" in d and d["get"][0] == "report" and self.cfgData["control"]["command"]["report"]["enabled"] == 1:
                 self.SendNote(

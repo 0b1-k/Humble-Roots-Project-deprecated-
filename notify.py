@@ -90,6 +90,8 @@ class Notifier(object):
             d = UrlDecode(lower(body))
             if "node" in d and "cmd" in d and "r" in d and "s" in d:
                 forward = True
+            elif "node" in d and "cmd" in d and "v" in d and "s" in d:
+                forward = True
             elif "get" in d and d["get"][0] == "report":
                 forward = True
             if forward:
