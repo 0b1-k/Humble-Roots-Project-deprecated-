@@ -95,10 +95,15 @@ This section is used by the *DB* module which writes sensor data to the InfluxDB
 ```
 
 "enabled": by default, the feature is disabled. Set it to 1 to enable it when InfluxDB is up and running.
+
 "host": specifies the domain name or IP address of the host running InfluxDB. By default, this is the local host.
+
 "port": specifies the port number where InfluxDB listens for REST API calls.
+
 "user": specifies the user to be used for authenticating to the InfluxDB instance.
+
 "pswd": specifies the password of the user.
+
 "db": specifies the name of the database where incoming sensor data should be written.
 
 #### "PushBullet" section
@@ -108,9 +113,9 @@ This section is used by the *Notify* module which handles push notifications bet
 ```
 "PushBullet": {
 	"enabled": 0,
-	"token": "&lt;YOUR APPLICATION TOKEN&gt;",
+	"token": "<YOUR APPLICATION TOKEN>",
 	"appDevice": "HumbleRoots",
-	"alertDevice": "&lt;MOBILE DEVICE PB ID&gt;",
+	"alertDevice": "<MOBILE DEVICE PB ID>",
 	"alertNumber": "+1 425 555 1212",
 	"subPrefix": "notify",
 	"accept": {"note": 0, "alert": 0}
@@ -119,11 +124,11 @@ This section is used by the *Notify* module which handles push notifications bet
 
 "enabled": by default, the feature is disabled. Set it to 1 to enable it once your PushBullet account is created and configured.
 
-"token": every application using the PushBullet API requires a unique token. To generate this token, simple go to the (PushBullet account page)[https://www.pushbullet.com/account] and copy the **Access Token** shown on the page. Then, simply paste the token here between the double quotes.
+"token": every application using the PushBullet API requires a unique token. To generate this token, simple go to the [PushBullet account page](https://www.pushbullet.com/account) and copy the **Access Token** shown on the page. Then, simply paste the token here between the double quotes.
 
 "appDevice": specifies an arbitratry device name representing the *Humble Roots Project" application. The push notifications emitted by the application will show up under this device name.
 
-"alertDevice": specifies the ID of the mobile device registered with PushBullet that will be used to send SMS messages (supported on Android devices only at the moment). You can find a list of the devices registered with PushBullet under the (Devices account page)[https://www.pushbullet.com/edit-devices].
+"alertDevice": specifies the ID of the mobile device registered with PushBullet that will be used to send SMS messages (Android only, at the moment). You can find a list of the devices registered with PushBullet under the [Devices account page](https://www.pushbullet.com/edit-devices).
 
 "alertNumber": specifies the target phone number for the SMS messages which should be phone number of the device specified as the "alertDevice" above.
 
