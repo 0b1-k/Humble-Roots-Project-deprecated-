@@ -33,7 +33,7 @@ alt="Enigma Girls 2 Growth Timelapse" width="240" height="180" border="10" /></a
 5. [Configure](./config/README.md) the ['bootstrap'](./config/bootstrap.json.template) and ['config'](./config/config.json.template) files.
 6. Start the project processes, in the following order:
 
-⋅⋅1. The *Control* module
+### *Control* module
 
 ```
 ./control.py
@@ -98,7 +98,7 @@ Pending
 ack
 ```
 
-⋅⋅2. The *Gateway* module
+### *Gateway* module
 
 ```
 ./gateway.py
@@ -114,7 +114,9 @@ Config sync'ed.
 Gateway started.
 ```
 
-⋅⋅3. If InfluxDB is configured, start the *DB* module
+### *DB* module
+
+If InfluxDB is configured, start the *DB* module
 
 ```
 ./db.py
@@ -131,7 +133,9 @@ DB connected.
 Listening for sensor data.
 ```
 
-⋅⋅4. If PushBullet is configured, start the *Notify* module
+### *Notify* module
+
+If PushBullet is configured, start the *Notify* module
 
 ```
 ./notify.py
@@ -156,7 +160,9 @@ Title: command June 25, 2015 at 1204PM, Body: node=valve&cmd=act&v=filter&s=on
 Title: control June 25, 2015 at 1208PM, Body: node=valve&cmd=act&v=filter&s=off
 ```
 
-⋅⋅5. As a sanity check, you can peek into the raw data being published by the application module at anytime.
+### Sanity Check
+
+As a sanity check, you can peek into the raw data being published by the application module at anytime.
 
 ```
 ./peek.py
