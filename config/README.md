@@ -19,8 +19,8 @@ This only needs to be done once.
 
 ## The role of the 'bootstrap.json' configuration file
 
-The role of 'bootstrap.json' is to allow distributed modules to find and connect to an MQTT broker.
-The exception to this is the *Control* process.
+The role of 'bootstrap.json' is to allow distributed application modules to find and connect to an MQTT broker.
+The exception to this is the *Control* module.
 By default, the MQTT broker is expected to be located on the local host.
 Once a process is connected to its MQTT broker, it receives its configuration settings by subscribing to the 'config' MQTT topic managed centrally by the *Control* process.
 
@@ -45,9 +45,9 @@ This is the only section in this configuration file. It should reflect the conne
 
 The 'config.json' file holds the settings used by the various *Humble Roots Project* modules.
 Whenever the 'config.json' is updated, the *Control* module detects the change and publishes the content of the file on the 'config' topic, thereby making it available to the other application modules.
-This method of distributing configuration settings is necessary when the modules are distributed on separate systems.
+This method of propagating configuration settings is necessary when the modules are distributed on separate systems.
 
-The 'config.json' file is composed of several setting sections and sub-sections driving the different features of the project, as described below.
+The 'config.json' file is composed of several sections and sub-sections driving the different features of the project, as described below.
 
 There are two types of settings:
 
@@ -56,7 +56,7 @@ There are two types of settings:
 
 Please refer to the [user-defined rules document](./rules.md) to understand how they work.
 
-When the *Control* module is provided with a [plant growth recipe](../recipe/EnigmaGirls2.csv), it also generates automation rules on the fly.
+When the *Control* module is provided with a [plant growth recipe](../recipes/EnigmaGirls2.csv), it also generates automation rules on the fly.
 Please note that this feature is not part of the v0.4 release.
 
 ### "mqtt" section
@@ -73,7 +73,6 @@ This section is used by all the application modules to connect to the MQTT broke
 ```
 
 "rootPrefix": defines a namespace for all the subtopics used by the application.
-
 This allows for multiple instances of the project to run side-by-side on the same broker, as needed.
 
 ### "serial" section
@@ -140,11 +139,11 @@ This section is used by the *Notify* module which handles push notifications bet
 	},
 ```
 
-"enabled": by default, the feature is disabled. Set it to 1 to enable it once your PushBullet account is created and configured.
+"enabled": by default, the feature is disabled. Set it to 1 to enable it once your [PushBullet account](https://www.pushbullet.com/account) is created and configured.
 
-"token": every application using the PushBullet API requires a unique token. To generate this token, simple go to the [PushBullet account page](https://www.pushbullet.com/account) and copy the **Access Token** shown on the page. Then, simply paste the token here between the double quotes.
+"token": every application using the PushBullet API requires a unique token. To generate this token, simply go to the [PushBullet account page](https://www.pushbullet.com/account) and copy the **Access Token** shown on the page. Then, simply paste the token over the "&lt;YOUR APPLICATION TOKEN&gt;", preserving the double quotes.
 
-"appDevice": specifies an arbitratry device name representing the *Humble Roots Project* application. The push notifications emitted by the application will show up under this device name.
+"appDevice": specifies an arbitratry device name representing the *Humble Roots Project* application. The push notifications sent by the application will show up under this device name.
 
 "alertDevice": specifies the ID of the mobile device registered with PushBullet that will be used to send SMS messages (Android only, at the moment). You can find a list of the devices registered with PushBullet under the [Devices account page](https://www.pushbullet.com/edit-devices).
 
@@ -168,7 +167,7 @@ As new device types get added to the sensor and actuator network, they need to b
 ### "node" section
 
 This section maps wireless node identifiers to friendly names.
-As new devices get added to the sensor and actuator network, they need to be listed here.
+As new nodes get added to the sensor and actuator network, they need to be defined here.
 Note that **the friendly names must be unique** just like their corresponding ID.
 
 ```
@@ -217,8 +216,8 @@ Note that **the friendly names must be unique** just like their corresponding ID
 
 ### "s" section
 
-This section maps the state zero and one to their corresponding OFF and ON friendly names.
-This is used in context with actuator nodes, such as the *relay* and the *valve*, to express the state of the actuators.
+This section maps the state *0* and *1* to their corresponding *off* and *on* friendly names.
+This is used in context with actuator nodes, such as the *relay* and the *valve* nodes, to express the state of the actuators.
 Note that **the friendly names must be unique** just like their corresponding ID.
 
 ```
@@ -230,12 +229,12 @@ Note that **the friendly names must be unique** just like their corresponding ID
 
 ### "control" section
 
-This section is used by the *Control* module which evaluates incoming sensor data against user-defined rules and reacts by issuing commands to the actuators driving the automation.
+This section is used by the *Control* module which evaluates incoming sensor data against rules and reacts by issuing commands to the actuators driving the automation.
 It is broken down into the following sub-sections:
 
 #### "config" sub-section
 
-Specifies the topic used to publish the content of the 'config.json' file to the application processes.
+Specifies the topic used to publish the content of the 'config.json' file to the application modules.
 
 ```
 	"config": {
@@ -246,7 +245,7 @@ Specifies the topic used to publish the content of the 'config.json' file to the
 #### "tick" sub-section
 
 Specifies the frequency in seconds at which the *Control* module evaluates time-based rules defined in the "timers" sub-section.
-Ticks appear as Unix epoch timestamps on the "time" topic such as "ts=1435267471".
+Ticks appear as Unix epoch timestamps, such as *ts=1435267471*, on the *time* topic.
 
 ```
 	"tick": {
@@ -275,7 +274,7 @@ Valid external commands can take two forms:
 1. Commands directed to wireless actuators such as "node=relay&cmd=act&r=light&s=on" or "node=valve&cmd=act&v=filter&s=on"
 2. Command requesting a report such as "get=report"
 
-External commands are currently handled through the *Notify* module, which relies on the [PushBullet API](https://www.pushbullet.com/get-started).
+External commands are handled through the *Notify* module, which relies on the [PushBullet API](https://www.pushbullet.com/get-started).
 Please refer to the [dependencies document](../dependencies.md) for details on installing and configuring *PushBullet*, *IFTTT* and *IFTTT's Do Button* on a mobile device to send commands to the application.
 
 ```
@@ -286,7 +285,7 @@ Please refer to the [dependencies document](../dependencies.md) for details on i
 		},
 ```
 
-"subPrefix": specifies the topic used to publish command to the *Control* module.
+"subPrefix": specifies the topic used to publish commands to the *Control* module.
 
 "report": {"enabled": 1} enables the reporting feature. {"enabled": 0} disables it.
 
@@ -308,7 +307,7 @@ An alert is also fired off once when the signal strength of that same node "reco
 
 This section is used to evaluate sensor data of type "srh", which stands for "Soil Relative Humidity".
 
-This rule drives the irrigation system, and is only activated between 7pm and 8pm. During that time interval, the rule checks the relative humidity of the soil as reported by the "plant" node and turns "on" the relay driving the irrigation pump if the moisture level of the soil is below 85%. The irrigation relay is turned "off" when the time window closes or when the relative soil moisture reaches the setpoint.
+This rule drives the irrigation system, and is only activated between 7pm and 8pm. During that time interval, the rule checks the relative humidity of the soil as reported by the "plant" node and turns "on" the relay driving the irrigation pump if the moisture level of the soil is below 85%. The irrigation relay is turned "off" when the time window closes or when the relative soil moisture reaches or exceeds the setpoint.
 
 ```
 	"srh": [{
@@ -367,7 +366,7 @@ Both rules also define alert thresholds should the ventilation fan or the dehumi
 
 #### "timers" rules sub-section
 
-Timer are triggered on a regular basis by the *Control* module (see the "tick" sub-section above) as opposed to being triggered by incoming sensor data.
+Timer rules are triggered on a regular basis by the *Control* module (see the "tick" sub-section above) as opposed to being triggered by incoming sensor data.
 Timer rule define a "task" name which must be unique.
 
 ```
