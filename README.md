@@ -32,6 +32,7 @@ alt="Enigma Girls 2 Growth Timelapse" width="240" height="180" border="10" /></a
 4. Install the [project dependencies](./dependencies.md).
 5. [Configure](./config/README.md) the ['bootstrap'](./config/bootstrap.json.template) and ['config'](./config/config.json.template) files.
 6. Start the project processes, in the following order:
+
 ..1. The *Control* module
 
 ```
