@@ -12,6 +12,8 @@ where sensors, actuators, rules and data visualization are combined to solve a p
 
 For in-depth details about the project, check out the [project documentation](./docs/HumbleRootsProject.pdf).
 
+This project was entered as part of the **[Hack A Day Prize 2015](https://hackaday.io/project/6458-the-humble-roots-project)**. Please show your support and give it some love :)
+
 ![Humble Roots Lab](./docs/humbleroots.png "Humble Roots Lab")
 
 **Plant Growth Timelapse**
@@ -156,7 +158,7 @@ As commands get sent from your mobile device, you should see messages like this:
 ```
 Title: control June 25, 2015 at 1201PM, Body: node=relay&cmd=act&r=vent&s=off
 Title: control June 25, 2015 at 1202PM, Body: get=report
-Title: command June 25, 2015 at 1204PM, Body: node=valve&cmd=act&v=filter&s=on
+Title: control June 25, 2015 at 1204PM, Body: node=valve&cmd=act&v=filter&s=on
 Title: control June 25, 2015 at 1208PM, Body: node=valve&cmd=act&v=filter&s=off
 ```
 
