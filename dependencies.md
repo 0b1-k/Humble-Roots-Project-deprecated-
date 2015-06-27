@@ -1,3 +1,4 @@
+The application modules have some required and some optional dependencies.
 
 ## Required Python Dependencies
 
@@ -82,6 +83,7 @@ For installing InfluxDB on the Raspberry Pi, or another ARM system, see [here](h
 ### [Install Grafana](http://grafana.org/)
 
 Grafana produces beautiful charts and works seamlessly with InfluxDB.
+You can find the Grafana dashboards used by the *Humble Roots Project* [here](./dashboard/grafana/README.md).
 
 ![Humble Roots Dashboard](./docs/pics/climate.png "Humble Roots Dashboard")
 
