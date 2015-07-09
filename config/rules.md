@@ -69,7 +69,7 @@ This name-value pair is always present in sensor data notifications.
 **low=0**: indicates if the battery level is low (1) or not (0).
 This name-value pair is always present in sensor data notifications.
 
-**pwr=1**: indicates if the sensor node is being powered from battery (o) or from power mains (0) 
+**pwr=1**: indicates if the sensor node is being powered from battery (0) or from power mains (1).
 This name-value pair is always present in sensor data notifications.
 
 **p=41**: *p* is the sensor data payload and is specific to the *srh* data type.
@@ -98,8 +98,8 @@ Now, let's look at the way rules reference the name-value pairs described above.
 
 **"enabled"**: 0 = rule is disabled, 1 = rule is enabled.
 
-**"node"**: the friendly name of the node as defined in the **"node"** section of the [config.json](./config.json.template) file.
-Automation rules should always reference sensor nodes by their friendly name instead of their ID for the sake of clarity.
+**"node"**: the friendly name of the node as defined in the *node* section of the [config.json](./config.json.template) file.
+For clarity's sake, automation rules should always reference sensor nodes by their friendly name instead of their ID.
 For instance, writing *node=relay&cmd=act&r=water&s=on* is easier to read and less error-prone than *node=20&cmd=act&r=3&s=1*.
 
 **"value"**: provides the name of the value that needs to be evaluated against the terms defined by the rule.
@@ -154,13 +154,20 @@ if (localtime >= time.from and localtime < time.to) {
 
 ### Processing Timer Notifications
 
-To do...
+Timer notifications are generated on a regular basis by the *Control* module.
+According to the frequency defined in the *tick* section of the (config.json.template)[./config.json.template] file.
+
+Example: 
 
 ```
 ts=1436299093
 ```
 
-Blah...
+*ts* stands for 'timestamp' and is expressed in seconds since the Unix Epoch.
+Whenever a timer notification is generated, the *Control* module handles them by evaluating the rules 
+defined in the *timers* section of the (config.json.template)[./config.json.template] file.
+Timer rules are identical to the rules used to handle sensor data notifications.
+The only difference is that timer rules must provide a unique *task* name which is used internally by the application.
 
 ```
 "timers": [{
