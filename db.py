@@ -104,7 +104,11 @@ class SensorDataParser(object):
                 try:
                     value = int(data[key][0])
                 except ValueError:
+                    pass
+                try:
                     value = float(data[key][0])
+                except ValueError:
+                    value = data[key][0]
                 d['points'].append(value)
         return d
 
