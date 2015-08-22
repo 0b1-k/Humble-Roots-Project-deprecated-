@@ -27,7 +27,6 @@
 #define THIS_NODE_ID    1
 #define FREQUENCY       RF69_433MHZ
 #define ENCRYPTKEY      "<YourCryptoKey!>"
-#define LED             9
 #define SERIAL_TIMEOUT  1
 
 RFM69 radio;
@@ -42,7 +41,6 @@ void setup() {
   delay(10);
   radio.initialize(FREQUENCY, THIS_NODE_ID, NETWORK_ID);
   radio.encrypt(ENCRYPTKEY);
-  pinMode(LED, OUTPUT);
   Serial.println("Listening");
   Serial.flush();
 }
