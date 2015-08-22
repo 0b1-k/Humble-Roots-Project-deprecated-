@@ -69,3 +69,4 @@ target/
 /arduino/soilrh/soilrh.ino~
 /arduino/valves/valves.ino~
 /arduino/waterlevel/waterlevel.ino~
+/backup/influxdb.sh~
