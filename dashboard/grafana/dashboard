@@ -128,7 +128,8 @@
             "RH (%)": "#7EB26D",
             "Vent (on/off)": "#70DBED",
             "Light (on/off)": "#E5A8E2",
-            "DH (on/off)": "#EF843C"
+            "DH (on/off)": "#EF843C",
+            "Air (on/off)": "#B7DBAB"
           },
           "seriesOverrides": [],
           "links": [],
@@ -145,7 +146,7 @@
         {
           "title": "Soil RH %",
           "error": false,
-          "span": 6,
+          "span": 4,
           "editable": true,
           "type": "graph",
           "id": 2,
@@ -169,7 +170,7 @@
             "thresholdLine": false
           },
           "lines": true,
-          "fill": 4,
+          "fill": 2,
           "linewidth": 1,
           "points": false,
           "pointradius": 5,
@@ -188,7 +189,7 @@
             "alignAsTable": true
           },
           "nullPointMode": "connected",
-          "steppedLine": false,
+          "steppedLine": true,
           "tooltip": {
             "value_type": "cumulative",
             "shared": false
@@ -221,7 +222,7 @@
         {
           "title": "Sump Depth (Cm)",
           "error": false,
-          "span": 6,
+          "span": 4,
           "editable": true,
           "type": "graph",
           "id": 4,
@@ -245,7 +246,7 @@
             "thresholdLine": false
           },
           "lines": true,
-          "fill": 4,
+          "fill": 2,
           "linewidth": 1,
           "points": false,
           "pointradius": 5,
@@ -264,7 +265,7 @@
             "hideEmpty": false
           },
           "nullPointMode": "connected",
-          "steppedLine": false,
+          "steppedLine": true,
           "tooltip": {
             "value_type": "cumulative",
             "shared": true
@@ -275,8 +276,8 @@
               "column": "cm",
               "series": "sump",
               "query": "select median(cm) from \"sump\" where $timeFilter group by time($interval) order asc",
-              "interval": "10m",
-              "alias": "Depth (cm)"
+              "interval": "1m",
+              "alias": "Depth (Cm)"
             },
             {
               "target": "",
@@ -286,16 +287,108 @@
               "query": "select distinct(s) from \"relay\" where $timeFilter and r = 1 group by time($interval) order asc",
               "condition": "r = 1",
               "alias": "Sump Pump Relay",
-              "interval": ""
+              "interval": "1m"
             }
           ],
           "aliasColors": {
             "Sump.Level": "#6ED0E0",
-            "Depth (cm)": "#70DBED"
+            "Depth (cm)": "#70DBED",
+            "Depth (Cm)": "#70DBED"
           },
           "seriesOverrides": [],
           "links": [],
           "height": ""
+        },
+        {
+          "title": "Tank Depth (Cm)",
+          "error": false,
+          "span": 4,
+          "editable": true,
+          "type": "graph",
+          "id": 5,
+          "datasource": "sensors",
+          "renderer": "flot",
+          "x-axis": true,
+          "y-axis": true,
+          "y_formats": [
+            "short",
+            "short"
+          ],
+          "grid": {
+            "leftMax": null,
+            "rightMax": null,
+            "leftMin": null,
+            "rightMin": null,
+            "threshold1": null,
+            "threshold2": null,
+            "threshold1Color": "rgba(216, 200, 27, 0.27)",
+            "threshold2Color": "rgba(234, 112, 112, 0.22)",
+            "thresholdLine": false
+          },
+          "lines": true,
+          "fill": 2,
+          "linewidth": 1,
+          "points": false,
+          "pointradius": 5,
+          "bars": false,
+          "stack": false,
+          "percentage": false,
+          "legend": {
+            "show": true,
+            "values": true,
+            "min": true,
+            "max": true,
+            "current": true,
+            "total": false,
+            "avg": true,
+            "alignAsTable": true,
+            "rightSide": false
+          },
+          "nullPointMode": "connected",
+          "steppedLine": true,
+          "tooltip": {
+            "value_type": "cumulative",
+            "shared": false
+          },
+          "targets": [
+            {
+              "function": "mean",
+              "column": "cm",
+              "series": "tank",
+              "query": "select mean(cm) from \"tank\" where $timeFilter group by time($interval) order asc",
+              "interval": "1m",
+              "alias": "Depth (Cm)"
+            },
+            {
+              "function": "distinct",
+              "column": "s",
+              "series": "valve",
+              "query": "select distinct(s) from \"valve\" where $timeFilter and v=0 group by time($interval) order asc",
+              "interval": "1m",
+              "alias": "Filter Valve State",
+              "condition": "v=0"
+            },
+            {
+              "target": "",
+              "function": "distinct",
+              "column": "s",
+              "series": "relay",
+              "query": "select distinct(s) from \"relay\" where $timeFilter and r=5 group by time($interval) order asc",
+              "condition": "r=5",
+              "alias": "Air Pump Relay"
+            }
+          ],
+          "aliasColors": {
+            "tank": "#6ED0E0",
+            "valve state": "#890F02",
+            "filter state": "#EAB839",
+            "Depth (cm)": "#6ED0E0",
+            "Depth (Cm)": "#70DBED",
+            "Air Pump State": "#7EB26D",
+            "Air Pump Relay": "#7EB26D"
+          },
+          "seriesOverrides": [],
+          "links": []
         }
       ]
     },
@@ -393,7 +486,8 @@
               "series": "relay",
               "query": "select mean(rssi) from \"relay\" where $timeFilter group by time($interval) order asc",
               "alias": "relay.rssi",
-              "interval": "5m"
+              "interval": "5m",
+              "rawQuery": false
             },
             {
               "target": "",
@@ -402,12 +496,23 @@
               "series": "valve",
               "query": "select mean(rssi) from \"valve\" where $timeFilter group by time($interval) order asc",
               "alias": "valve.rssi",
-              "interval": "5m"
+              "interval": "5m",
+              "rawQuery": false
+            },
+            {
+              "target": "",
+              "function": "mean",
+              "column": "rssi",
+              "series": "tank",
+              "query": "select mean(rssi) from \"tank\" where $timeFilter group by time($interval) order asc",
+              "alias": "tank.rssi",
+              "interval": "5m",
+              "rawQuery": false
             }
           ],
           "aliasColors": {
-            "tank.rssi": "#6ED0E0",
-            "plant.rssi": "#3F6833",
+            "tank.rssi": "#CCA300",
+            "plant.rssi": "#7EB26D",
             "climate.rssi": "#BF1B00",
             "sump.rssi": "#70DBED",
             "valve.rssi": "#F4D598"
