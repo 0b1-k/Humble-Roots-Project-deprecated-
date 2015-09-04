@@ -32,6 +32,7 @@ class InfluxDBWriter(object):
         self.config = config
         self.client = None
         self.sequence = 0
+        self.writeExceptionCount = 0
         
     def Connect(self):
         self.client = InfluxDBClient(
@@ -58,8 +59,13 @@ class InfluxDBWriter(object):
         jsonBody[0]["points"][0] += points
         jsonBody[0]["columns"] += columns
 
-        self.client.write_points(jsonBody)
-        #print(str(jsonBody))
+        try:
+            self.client.write_points(jsonBody)
+        except Exception as e:
+            self.writeExceptionCount += 1
+            print("Count: {0}\nDetails:\n{1}".format(self.writeExceptionCount, traceback.format_exc()))
+            self.Disconnect()
+            self.Connect()
 
 
 class SensorDataParser(object):
