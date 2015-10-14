@@ -18,13 +18,20 @@
     You should have received a copy of the GNU General Public License
     along with "HRP".  If not, see <http://www.gnu.org/licenses/>.
 """
+import time
 import traceback
+import logging
+import logging.config
 from pb import PushBullet, HOST
 from config import Config
 from mqtt import MQTT
-from utils import UrlDecode, GetSecondsSinceEpoch
+from utils import UrlDecode, GetSecondsSinceEpoch, WaitForInternetUp
 from threading import Event
 from string import lower, find
+
+logging.config.fileConfig('./config/logger.ini')
+logger = logging.getLogger('Roots')
+logger.name = "notify"
 
 class Notifier(object):
     def __init__(self, cfgData):
@@ -96,24 +103,24 @@ class Notifier(object):
                 forward = True
             if forward:
                 self.pubSub.Publish(self.cfgData["control"]["command"]["subPrefix"], body)
-                print("Title: {0}, Body: {1}".format(title, body))
+                logger.info("Title: {0}, Body: {1}".format(title, body))
             else:
-                print("Invalid message: {0}".format(body))
+                logger.warn("Invalid message: {0}".format(body))
         except ValueError as e:
-            print("Malformed message: {0}".format(body))
+            logger.warn("Malformed message: {0}".format(body))
 
     def CallbackNotify(self, client, userdata, msg):
         try:
             d = UrlDecode(msg.payload)
         except ValueError as e:
-            print("Invalid message: {0}".format(msg.payload))
+            logger.warn("Invalid message: {0}".format(msg.payload))
             return
         try:
             handlerType = d["type"][0]
             func = self.notifyHandlers[handlerType]
             func(d)
         except KeyError as e:
-            print("Invalid notification type: {0}".format(msg.payload))
+            logger.error("Invalid notification type: {0}".format(msg.payload))
             return
 
     def PushAlert(self, data):
@@ -125,7 +132,7 @@ class Notifier(object):
                 self.cfgData["PushBullet"]["alertNumber"],
                 body)
         except Exception as e:
-            print("PushAlert failed: {0}".format(str(e)))
+            logger.warn("PushAlert failed: {0}".format(str(e)))
     
     def PushNote(self, data):
         try:
@@ -134,7 +141,7 @@ class Notifier(object):
                 "{0} {1}".format(self._GetSignature(), data["title"][0]),
                 data["body"][0])
         except Exception as e:
-            print("PushNote failed: {0}".format(str(e)))
+            logger.warn("PushNote failed: {0}".format(str(e)))
         
     def CallbackStopEvent(self, client, userdata, msg):
         self.stopEventCallbackCount += 1
@@ -147,13 +154,13 @@ def Run():
     
     mq = MQTT(cfgData['mqtt']['rootPrefix'])
     mq.Start(cfgData['mqtt']['host'], int(cfgData['mqtt']['port']), int(cfgData['mqtt']['keepalive']))
-    print("MQTT started.")
+    logger.info("MQTT started.")
     
     mq.Subscribe("config", config.OnConfigUpdate)
     cfgData = config.SyncUpdate()
 
-    print("Config sync'ed.")
-    print("Notifier started...")
+    logger.info("Config sync'ed.")
+    logger.info("Notifier started...")
     
     n = Notifier(cfgData)
 
@@ -164,9 +171,9 @@ def Run():
     try:
         n.Start(mq)
     except Exception as e:
-        print(str(e))
+        logger.error(str(e))
     
-    print("Stopping...")
+    logger.info("Stopping...")
     
     mq.UnSubscribe("config")
     mq.Stop()
@@ -176,7 +183,9 @@ def Run():
 if __name__ == '__main__':
     exitCode = False
     while exitCode == False:
-        print("Started: {0}".format(__file__))
+        logger.info("Started: {0}".format(__file__))
+        logger.info("Waiting for Internet connectivity...")
+        WaitForInternetUp()
         exitCode = Run()
-    print("Stopped: {0}".format(__file__))
-
+        time.sleep(1)
+    logger.info("Stopped: {0}".format(__file__))

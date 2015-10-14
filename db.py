@@ -22,10 +22,17 @@ import time
 import sys
 import json
 import traceback
+import logging
+import logging.config
 from config import Config
 from mqtt import MQTT
-from influxdb import InfluxDBClient
-from utils import UrlDecode
+# InfluxDB 0.8.x only at the moment
+from influxdb.influxdb08 import InfluxDBClient
+from utils import UrlDecode, WaitForInternetUp
+
+logging.config.fileConfig('./config/logger.ini')
+logger = logging.getLogger('Roots')
+logger.name = "db"
 
 class InfluxDBWriter(object):
     def __init__(self, config):
@@ -63,7 +70,7 @@ class InfluxDBWriter(object):
             self.client.write_points(jsonBody)
         except Exception as e:
             self.writeExceptionCount += 1
-            print("Count: {0}\nDetails:\n{1}".format(self.writeExceptionCount, traceback.format_exc()))
+            logger.error("Count: {0}\nDetails:\n{1}".format(self.writeExceptionCount, traceback.format_exc()))
             self.Disconnect()
             self.Connect()
 
@@ -82,7 +89,7 @@ class SensorDataParser(object):
         try:
             d = UrlDecode(msg.payload)
         except ValueError as e:
-            print traceback.format_exc()
+            logger.warn(traceback.format_exc())
             return
         try:
             nodeType = d["t"][0]
@@ -139,25 +146,25 @@ def Run():
     config = Config()
     cfgData = config.Load()
 
-    print("MQTT started.")
+    logger.info("MQTT started.")
     
     mq = MQTT(cfgData['mqtt']['rootPrefix'])
     mq.Start(cfgData['mqtt']['host'], int(cfgData['mqtt']['port']), int(cfgData['mqtt']['keepalive']))
     
     mq.Subscribe("config", config.OnConfigUpdate)
     cfgData = config.SyncUpdate()
-    print("Config sync'ed.")
+    logger.info("Config sync'ed.")
     
     dbw = InfluxDBWriter(cfgData)
     dbw.Connect()
-    print("DB connected.")
+    logger.info("DB connected.")
     
     sdp = SensorDataParser(dbw, cfgData)
     mq.Subscribe(cfgData['serial']['pubPrefix'], sdp.Callback)
-    print("Listening for sensor data.")
+    logger.info("Listening for sensor data.")
     
     exitFlag = config.Idle(OnIdle)
-    print("Stopping...")
+    logger.info("Stopping...")
     
     mq.UnSubscribe(cfgData['serial']['pubPrefix'])
     mq.UnSubscribe("config")
@@ -170,6 +177,9 @@ def Run():
 if __name__ == '__main__':
     exitCode = False
     while exitCode == False:
-        print("Started: {0}".format(__file__))
+        logger.info("Started: {0}".format(__file__))
+        logger.info("Waiting for Internet connectivity...")
+        WaitForInternetUp()
         exitCode = Run()
-    print("Stopped: {0}".format(__file__))
+        time.sleep(1)
+    logger.info("Stopped: {0}".format(__file__))
