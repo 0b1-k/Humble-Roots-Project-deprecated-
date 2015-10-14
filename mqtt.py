@@ -37,7 +37,7 @@ class MQTT(object):
         self._mqtt.on_publish = self._on_publish
         self._mqtt.on_subscribe = self._on_subscribe
         self._mqtt.on_unsubscribe = self._on_unsubscribe
-        self._mqtt.on_log = self._on_log
+        #self._mqtt.on_log = self._on_log
         self.publisherPrefix = publisherPrefix
 
     def __exit__(self):
@@ -87,7 +87,7 @@ class MQTT(object):
     def _on_unsubscribe(self, client, userdata, mid):
         pass
     
-    def _on_log(self, client, userdata, level, buf): 
+    def _on_log(self, client, userdata, level, buf):
         if (level == mqtt.MQTT_LOG_INFO):
             logger.info(buf)
         elif (level == mqtt.MQTT_LOG_NOTICE):
