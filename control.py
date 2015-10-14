@@ -147,7 +147,7 @@ class Controller():
     def CallbackShell(self, client, userdata, msg):
         if self.cfgData["control"]["command"]["enabled"] == 1:
             logger.info("Forwarded command: {0}".format(msg.payload))
-            d = _UrlDecode(lower(msg.payload))
+            d = self._UrlDecode(lower(msg.payload))
             if d == None:
                 logger.error("Malformed command: {0}".format(msg.payload))
                 return
