@@ -22,7 +22,13 @@ import serial
 import time
 import threading
 import traceback
+import logging
+import logging.config
 from config import Config
+
+logging.config.fileConfig('./config/logger.ini')
+logger = logging.getLogger('Roots')
+logger.name = "serialadapter"
 
 class SerialAdapter(threading.Thread):
     def __init__(self, group=None, target=None, name=None, args=(), kwargs=None, verbose=None):
@@ -61,7 +67,7 @@ class SerialAdapter(threading.Thread):
                                     try:
                                         self.Callback("".join(inBytes))
                                     except Exception as e:
-                                        print traceback.format_exc()
+                                        logger.error(traceback.format_exc())
                                 inBytes = []
                         else:
                             inBytes.append(data)
@@ -76,19 +82,20 @@ class SerialAdapter(threading.Thread):
     def Write(self, data):
         self.comPort.write(data)
         self.comPort.flushOutput()
+        logger.debug("Write: {0}".format(data))
         
     def Stop(self):
         self.stopEvent.set()
         self.join()
         
     def _OnException(self, e):
-        print("{0}", e.__str__())
+        logger.error("{0}", e.__str__())
         self.stopEvent.set()
         time.sleep(0.1)
 
 def Callback(data):
-    print data
-    
+    logger.debug(data)
+
 if __name__ == '__main__':
     try:
         cfgData = Config().Load('./config/config.json')

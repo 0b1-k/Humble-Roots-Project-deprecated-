@@ -83,6 +83,7 @@ class Controller():
         try:
             d = UrlDecode(url)
         except ValueError as e:
+            logger.error("Malformed url: {0}".format(url))
             logger.exception(traceback.format_exc())
         return d
         
@@ -120,16 +121,7 @@ class Controller():
             if timeRules is not None:
                 for rule in timeRules:
                     rc = self._EvalRule(rule, d)
-            #self._PingNodes()
             self._TrackNodeTimeout()
-
-    def _PingNodes(self):
-        for nodeID in self.nodeMap:
-            # Fix me: rssi needs to come from gateway
-            cmd = UrlEncode({"node": nodeID, "cmd": "ping", "t": "png", "rssi": -99})
-            rc = self.cmd.Shell(cmd)
-            if (rc == self.cmd.STATUS_ACK):
-                self._ResetNodeTimeout(nodeID)
 
     def _InitNodeTimeoutTracker(self, nodeMap, freqSec):
         nt = dict()
@@ -154,8 +146,11 @@ class Controller():
 
     def CallbackShell(self, client, userdata, msg):
         if self.cfgData["control"]["command"]["enabled"] == 1:
-            logger.info("~\r\nForwarded command: {0}".format(msg.payload))
-            d = UrlDecode(lower(msg.payload))
+            logger.info("Forwarded command: {0}".format(msg.payload))
+            d = _UrlDecode(lower(msg.payload))
+            if d == None:
+                logger.error("Malformed command: {0}".format(msg.payload))
+                return
             if "node" in d and "cmd" in d:
                 self.cmd.Shell(msg.payload)
             elif "get" in d and d["get"][0] == "report" and self.cfgData["control"]["command"]["report"]["enabled"] == 1:
