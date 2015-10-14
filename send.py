@@ -18,6 +18,10 @@
     You should have received a copy of the GNU General Public License
     along with "HRP".  If not, see <http://www.gnu.org/licenses/>.
 """
+import sys
+import random
+import logging
+import logging.config
 from config import Config
 from mqtt import MQTT
 from utils import UrlDecode, UrlEncode
@@ -25,8 +29,9 @@ from time import sleep
 from hashids import Hashids
 from os import urandom
 from threading import Lock, Event, Thread
-import sys
-import random
+
+logging.config.fileConfig('./config/logger.ini')
+logger = logging.getLogger('Roots')
 
 class Command(object):
     STATUS_TIMEOUT = -1
@@ -118,13 +123,13 @@ class Command(object):
                 resolvedCmd = self._Resolve(cmd)
                 resolvedCmd = self._AppendToken(resolvedCmd, token)
                 self.mq.Publish(self.cfgData["serial"]["subPrefix"], resolvedCmd)
-                print("Pending")
+                logger.info("Pending")
                 while result == self.STATUS_PENDING and not self.timerThreadExitEvent.isSet():
                     sleep(self.TIMER_WAIT_TIME_SEC)
                     result = self._GetCommandStatus(token)
-                print(self.stateToStateStr[result])
+                logger.info(self.stateToStateStr[result])
             except:
-                print("Bad command: {0}".format(cmd))
+                logger.error("Bad command: {0}".format(cmd))
                 retries = 0
             finally:
                 self._DeleteToken(token)
@@ -163,7 +168,7 @@ class Command(object):
                 try:
                     subValue = self._GetKeyByValue(self.cfgData[key], value)
                     if subValue is None:
-                        print("Unresolved: key[{0}], value[{1}] in {2}".format(key, value, data))
+                        logger.error("Unresolved: key[{0}], value[{1}] in {2}".format(key, value, data))
                         raise
                     else:
                         decoded[key][0] = subValue

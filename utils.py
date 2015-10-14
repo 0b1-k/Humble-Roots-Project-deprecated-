@@ -23,6 +23,7 @@ from urllib import urlencode
 from urlparse import parse_qs
 import inspect
 import time
+import socket
 
 # Map a range of values to another (see: http://rosettacode.org/wiki/Map_range#Python)
 def MapRange(range1, range2, value):
@@ -52,5 +53,17 @@ def GetStackInfo():
     #print info.lineno                         # __LINE__
     return info
 
+def WaitForInternetUp(hostname="www.google.com", port=443):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    while True:
+        try:
+            sock.connect((hostname, port))
+            break
+        except socket.error as msg:
+            print msg
+            time.sleep(1)
+        finally:
+            sock.close()
+
 if __name__ == '__main__':
-    print GetSecondsSinceEpoch()
+    WaitForInternetUp()

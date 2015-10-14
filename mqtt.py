@@ -18,9 +18,15 @@
     You should have received a copy of the GNU General Public License
     along with "HRP".  If not, see <http://www.gnu.org/licenses/>.
 """
-import paho.mqtt.client as mqtt
 import time
+import logging
+import logging.config
+import paho.mqtt.client as mqtt
 from utils import GetTimeStamp, UrlEncode, UrlDecode
+
+logging.config.fileConfig('./config/logger.ini')
+logger = logging.getLogger('Roots')
+logger.name = "mqtt"
 
 class MQTT(object):
     def __init__(self, publisherPrefix="foo"):
@@ -64,10 +70,10 @@ class MQTT(object):
         self._mqtt.unsubscribe(t)
         
     def _on_connect(self, client, userdata, flags, rc):
-        print(mqtt.connack_string(rc))
+        logger.info(mqtt.connack_string(rc))
     
     def _on_disconnect(self, client, userdata, rc):
-        print(mqtt.error_string(rc))
+        logger.info(mqtt.error_string(rc))
     
     def _on_message(self, client, userdata, message):
         pass
@@ -83,15 +89,15 @@ class MQTT(object):
     
     def _on_log(self, client, userdata, level, buf): 
         if (level == mqtt.MQTT_LOG_INFO):
-            pass
+            logger.info(buf)
         elif (level == mqtt.MQTT_LOG_NOTICE):
-            pass
+            logger.info(buf)
         elif (level == mqtt.MQTT_LOG_WARNING):
-            pass
+            logger.warn(buf)
         elif (level == mqtt.MQTT_LOG_ERR):
-            pass
+            logger.error(buf)
         elif (level == mqtt.MQTT_LOG_DEBUG):
-            pass
+            logger.debug(buf)
 
     def GetCanonicalTopic(self, topic):
         return "{0}/{1}".format(self.publisherPrefix, topic)

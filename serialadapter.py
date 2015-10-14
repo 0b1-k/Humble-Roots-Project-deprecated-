@@ -82,7 +82,7 @@ class SerialAdapter(threading.Thread):
         self.join()
         
     def _OnException(self, e):
-        print traceback.format_exc
+        print("{0}", e.__str__())
         self.stopEvent.set()
         time.sleep(0.1)
 
@@ -91,7 +91,7 @@ def Callback(data):
     
 if __name__ == '__main__':
     try:
-        cfgData = Config().Load()
+        cfgData = Config().Load('./config/config.json')
         sa = SerialAdapter()
         sa.Start(cfgData['serial']['port'], cfgData['serial']['baudrate'], Callback)
         time.sleep(20)

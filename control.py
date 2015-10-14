@@ -18,12 +18,15 @@
     You should have received a copy of the GNU General Public License
     along with "HRP".  If not, see <http://www.gnu.org/licenses/>.
 """
+import time
 import datetime
 import sys
 import json
 import traceback
 import gc
 import hashlib
+import logging
+import logging.config
 from time import sleep, strftime
 from threading import Lock
 from config import Config
@@ -32,6 +35,10 @@ from utils import UrlDecode, UrlEncode, GetSecondsSinceEpoch
 from send import Command
 from string import lower
 from report import Report
+
+logging.config.fileConfig('./config/logger.ini')
+logger = logging.getLogger('Roots')
+logger.name = "control"
 
 class Controller():
     def __init__(self, cfgData, pubSub):
@@ -76,7 +83,7 @@ class Controller():
         try:
             d = UrlDecode(url)
         except ValueError as e:
-            print traceback.format_exc()
+            logger.exception(traceback.format_exc())
         return d
         
     def CallbackSensor(self, client, userdata, msg):
@@ -113,8 +120,17 @@ class Controller():
             if timeRules is not None:
                 for rule in timeRules:
                     rc = self._EvalRule(rule, d)
+            #self._PingNodes()
             self._TrackNodeTimeout()
-        
+
+    def _PingNodes(self):
+        for nodeID in self.nodeMap:
+            # Fix me: rssi needs to come from gateway
+            cmd = UrlEncode({"node": nodeID, "cmd": "ping", "t": "png", "rssi": -99})
+            rc = self.cmd.Shell(cmd)
+            if (rc == self.cmd.STATUS_ACK):
+                self._ResetNodeTimeout(nodeID)
+
     def _InitNodeTimeoutTracker(self, nodeMap, freqSec):
         nt = dict()
         for nodeID in nodeMap:
@@ -138,7 +154,7 @@ class Controller():
 
     def CallbackShell(self, client, userdata, msg):
         if self.cfgData["control"]["command"]["enabled"] == 1:
-            print("-----------------------\r\nForwarded command: {0}".format(msg.payload))
+            logger.info("~\r\nForwarded command: {0}".format(msg.payload))
             d = UrlDecode(lower(msg.payload))
             if "node" in d and "cmd" in d:
                 self.cmd.Shell(msg.payload)
@@ -147,21 +163,21 @@ class Controller():
                     self.report.GetTitle(),
                     self.report.GetBody())
         else:
-            print("Remote interface disabled.")
+            logger.info("Remote interface disabled.")
                         
     def _EvalRule(self, rule, data):
         if rule["enabled"] == 1:
-            print("-----------------------")
+            logger.info("~")
             if "node" in data:
                 nodeID = data["node"][0]
                 if "node" in rule and self.nodeMap[nodeID] != rule["node"]:
                         return
                 else:
-                    print("node:{0}".format(self.nodeMap[nodeID]))
+                    logger.info("node:{0}".format(self.nodeMap[nodeID]))
             else:
                 nodeID = None
             value = float(data[rule["value"]][0])
-            print("value={0}".format(value))
+            logger.info("value={0}".format(value))
             if "alert" in rule and nodeID is not None:
                 if self._EvalCondition(value, rule["alert"], data) == True:
                     self.SendAlert(value, rule, nodeID)
@@ -248,11 +264,11 @@ class Controller():
         return h.hexdigest()
     
     def _SendCommand(self, rule, onOff):
-        print(str(rule[onOff]["cmd"]))
+        logger.info(str(rule[onOff]["cmd"]))
         self.cmd.Shell(rule[onOff]["cmd"])
         
     def _EvalCondition(self, value, condition, data):
-        print(str(condition))
+        logger.info(str(condition))
         if "from" in condition and "to" in condition:
             ftInt = condition["from"].split(':')
             ttInt = condition["to"].split(':')
@@ -302,42 +318,43 @@ class Controller():
 def Run():
     config = Config()
     cfgData = config.Load('./config/config.json')
-    print("config loaded.")
+    logger.info("config loaded.")
     
     mq = MQTT(cfgData['mqtt']['rootPrefix'])
     mq.Start(cfgData['mqtt']['host'], int(cfgData['mqtt']['port']), int(cfgData['mqtt']['keepalive']))
-    print("MQTT started.")
+    logger.info("MQTT started.")
     
     mq.Publish(cfgData["control"]["config"]["subPrefix"], config.GetRawContent(), retain=True)
-    print("Config published.")
+    logger.info("Config published.")
     
     ctl = Controller(cfgData, mq)
     ctl.Start()
-    print("Controller started.")
+    logger.info("Controller started.")
     
     exitFlag = False
     try:
         while not config.IsChanged() and not exitFlag:
             ctl.TrackTime()
     except KeyboardInterrupt as e:
-        print("kbd int. in " + __file__)
+        logger.info("kbd int. in " + __file__)
         exitFlag = True
 
-    print("Controller stopping...")
+    logger.info("Controller stopping...")
     ctl.Stop()
-    print("Controller stopped.")
+    logger.info("Controller stopped.")
     
     mq.Stop()
-    print("MQTT stopped.")
+    logger.info("MQTT stopped.")
     
     gc.collect()
-    print("GC collection complete.")
+    logger.info("GC collection complete.")
     
     return exitFlag
 
 if __name__ == '__main__':
     exitCode = False
     while exitCode == False:
-        print("Started: {0}".format(__file__))
+        logger.info("Started: {0}".format(__file__))
         exitCode = Run()
-    print("Stopped: {0}".format(__file__))
+        time.sleep(1)
+    logger.info("Stopped: {0}".format(__file__))

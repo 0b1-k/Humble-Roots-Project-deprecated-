@@ -18,11 +18,17 @@
     You should have received a copy of the GNU General Public License
     along with "HRP".  If not, see <http://www.gnu.org/licenses/>.
 """
+import time
+import logging
+import logging.config
 from config import Config
 from serialadapter import SerialAdapter
 from mqtt import MQTT
 from utils import GetSecondsSinceEpoch
-import time
+
+logging.config.fileConfig('./config/logger.ini')
+logger = logging.getLogger('Roots')
+logger.name = "gateway"
 
 class Gateway(object):
     def __init__(self, config, pubSub):
@@ -55,29 +61,29 @@ def Run():
     config = Config()
     cfgData = config.Load()
 
-    print("MQTT started.")
+    logger.info("MQTT started.")
     
     mq = MQTT(cfgData['mqtt']['rootPrefix'])
     mq.Start(cfgData['mqtt']['host'], int(cfgData['mqtt']['port']), int(cfgData['mqtt']['keepalive']))
     
     mq.Subscribe("config", config.OnConfigUpdate)
     cfgData = config.SyncUpdate()
-    print("Config sync'ed.")
+    logger.info("Config sync'ed.")
     
     gw = Gateway(cfgData, mq)
     gw.Start()
     
-    print("Gateway started.")
+    logger.info("Gateway started.")
     
     exitFlag = False
     try:
         while not gw.IsStopEventSet() and not config.IsChanged() and not exitFlag:
             time.sleep(.1)
     except KeyboardInterrupt as e:
-        print("kbd int. in " + __file__)
+        logger.info("kbd int. in " + __file__)
         exitFlag = True
         
-    print("Gateway stopping...")
+    logger.info("Gateway stopping...")
     
     mq.UnSubscribe("config")
     
@@ -90,6 +96,7 @@ def Run():
 if __name__ == '__main__':
     exitCode = False
     while exitCode == False:
-        print("Started: {0}".format(__file__))
+        logger.info("Started: {0}".format(__file__))
         exitCode = Run()
-    print("Stopped: {0}".format(__file__))
+        time.sleep(1)
+    logger.info("Stopped: {0}".format(__file__))
