@@ -30,7 +30,6 @@ def MapRange(range1, range2, value):
     (a1, a2), (b1, b2) = range1, range2
     return  b1 + ((value - a1) * (b2 - b1) / (a2 - a1))
 
-# Print a time stamp
 def GetTimeStamp():
     return str(datetime.now())
 
