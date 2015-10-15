@@ -88,7 +88,7 @@ def Run():
     mq.UnSubscribe("config")
     
     gw.Stop()
-    mq.Stop
+    mq.Stop()
     
     return exitFlag
 
